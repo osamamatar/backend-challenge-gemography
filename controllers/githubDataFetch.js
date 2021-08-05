@@ -2,12 +2,13 @@ const moment = require("moment");
 const axios = require("axios");
 
 const fetchDataFromGithub = async () => {
-  const date = getting_date();
+  const date = moment().subtract(100, "days").format("YYYY-MM-DD").toString();
   try {
-    const response = await axios.get(
-      `https://api.github.com/search/repositories?q=created:>100&sort=stars&order=desc`
+    //fetching trending repos on github in last 100 day
+    const result = await axios.get(
+      `https://api.github.com/search/repositories?q=created:>${date}&sort=stars&per_page=100&order=desc`
     );
-    const pureData = response.data.items;
+    const pureData = result.data.items;
     let modifedData = removeNullValues(pureData);
     modifedData = removeUnnecessaryFields(modifedData);
     let languages = getLanguages(modifedData);
@@ -87,8 +88,5 @@ const removeUnnecessaryFields = (list) => {
   });
   return modifedList;
 };
-const getting_date = () => {
-  const date = moment().subtract(30, "days").format("YYYY-MM-D");
-  return date.toString();
-};
+
 module.exports = fetchDataFromGithub;
